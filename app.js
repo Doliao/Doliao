@@ -235,44 +235,13 @@ function renderProducts() {
   }).join('');
 }
 
-// 切換購物車步驟（步驟 1：商品清單；步驟 2：填寫結帳資訊）
-function switchCartStep(step) {
-  const stepItems = document.getElementById('cartStepItems');
-  const stepCheckout = document.getElementById('cartStepCheckout');
-  const titleEl = document.getElementById('cartDrawerTitle');
-  const badgeEl = document.getElementById('cartStepBadge');
-
-  if (step === 'checkout') {
-    if (stepItems) stepItems.style.display = 'none';
-    if (stepCheckout) stepCheckout.style.display = 'flex';
-    if (titleEl) titleEl.innerHTML = '📝 填寫結帳資訊';
-    if (badgeEl) {
-      badgeEl.textContent = '步驟 2/2';
-      badgeEl.style.background = '#d1fae5';
-      badgeEl.style.color = '#065f46';
-    }
-    setTimeout(() => {
-      document.getElementById('customerName')?.focus();
-    }, 80);
-  } else {
-    if (stepItems) stepItems.style.display = 'flex';
-    if (stepCheckout) stepCheckout.style.display = 'none';
-    if (titleEl) titleEl.innerHTML = '🛒 購物清單';
-    if (badgeEl) {
-      badgeEl.textContent = '步驟 1/2';
-      badgeEl.style.background = '#e2e8f0';
-      badgeEl.style.color = '#475569';
-    }
-  }
-}
-
-// 渲染側邊購物車 Drawer
+// 渲染側邊購物車 Drawer（單一捲動視窗，商品在上、小計與結帳資訊在下）
 function renderCart() {
   const cartListEl = document.getElementById('cartItemsList');
   const cartBadge = document.getElementById('cartBadge');
+  const cartCountBadge = document.getElementById('cartCountBadge');
   const cartEmptyView = document.getElementById('cartEmptyView');
   const cartContentWrap = document.getElementById('cartContentWrap');
-  const previewTotalEl = document.getElementById('cartGrandTotalPreview');
   const summaryTextEl = document.getElementById('cartItemsSummaryText');
   const subtotalEl = document.getElementById('cartSubtotal');
   const grandTotalEl = document.getElementById('cartGrandTotal');
@@ -281,20 +250,22 @@ function renderCart() {
   const cartItemIds = Object.keys(cart).filter(id => cart[id] > 0);
   const totalCount = cartItemIds.reduce((sum, id) => sum + cart[id], 0);
 
-  // 更新導航列角標
+  // 更新導航列角標與頂部徽章
   if (cartBadge) {
     cartBadge.textContent = totalCount;
     cartBadge.style.display = totalCount > 0 ? 'flex' : 'none';
     cartBadge.classList.add('bump');
     setTimeout(() => cartBadge.classList.remove('bump'), 250);
   }
+  if (cartCountBadge) {
+    cartCountBadge.textContent = `共 ${totalCount} 件商品`;
+  }
 
-  // 購物車為空時顯示
+  // 購物車為空時顯示空畫面
   if (cartItemIds.length === 0) {
     if (cartEmptyView) cartEmptyView.style.display = 'flex';
     if (cartContentWrap) cartContentWrap.style.display = 'none';
     if (navCartTotalEl) navCartTotalEl.textContent = 'NT$ 0';
-    switchCartStep('items');
     return;
   }
 
@@ -335,9 +306,8 @@ function renderCart() {
     }).join('');
   }
 
-  // 更新步驟一與步驟二之金額顯示
-  if (previewTotalEl) previewTotalEl.textContent = `NT$ ${totalAmount.toLocaleString()}`;
-  if (summaryTextEl) summaryTextEl.textContent = `已選 ${totalCount} 件商品品項`;
+  // 更新金額顯示
+  if (summaryTextEl) summaryTextEl.textContent = `已選 ${totalCount} 件商品小計`;
   if (subtotalEl) subtotalEl.textContent = `NT$ ${totalAmount.toLocaleString()}`;
   if (grandTotalEl) grandTotalEl.textContent = `NT$ ${totalAmount.toLocaleString()}`;
   if (navCartTotalEl) navCartTotalEl.textContent = `NT$ ${totalAmount.toLocaleString()}`;
@@ -468,11 +438,26 @@ async function handleCheckout(e) {
       showOrderSuccess(payload);
     }
 
-    // 清空購物車與表單
+    // 清空購物車與表單（確保下一位顧客結帳時欄位完全乾淨且立即可輸入）
     cart = {};
-    if (nameInput) nameInput.value = '';
-    if (phoneInput) phoneInput.value = '';
-    if (noteInput) noteInput.value = '';
+    if (nameInput) {
+      nameInput.value = '';
+      nameInput.disabled = false;
+    }
+    if (phoneInput) {
+      phoneInput.value = '';
+      phoneInput.disabled = false;
+    }
+    if (noteInput) {
+      noteInput.value = '';
+      noteInput.disabled = false;
+    }
+    isSubmitting = false;
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = '確認送出訂單（即時扣除庫存）';
+    }
+
     closeCartDrawer();
     renderProducts();
     renderCart();
@@ -622,27 +607,6 @@ function bindEvents() {
     });
   }
 
-  // 步驟一：前往結帳（填寫訂購資訊）
-  const btnGoToCheckout = document.getElementById('btnGoToCheckout');
-  if (btnGoToCheckout) {
-    btnGoToCheckout.addEventListener('click', () => {
-      const cartItemIds = Object.keys(cart).filter(id => cart[id] > 0);
-      if (cartItemIds.length === 0) {
-        showToast('購物車內目前沒有商品喔！', 'warn');
-        return;
-      }
-      switchCartStep('checkout');
-    });
-  }
-
-  // 步驟二：返回修改商品品項
-  const btnBackToItems = document.getElementById('btnBackToItems');
-  if (btnBackToItems) {
-    btnBackToItems.addEventListener('click', () => {
-      switchCartStep('items');
-    });
-  }
-
   // 購物車開啟/關閉
   const cartTrigger = document.getElementById('btnOpenCart');
   const cartClose = document.getElementById('btnCloseCart');
@@ -668,7 +632,21 @@ function bindEvents() {
 }
 
 function openCartDrawer() {
-  switchCartStep('items');
+  const nameInput = document.getElementById('customerName');
+  const phoneInput = document.getElementById('customerPhone');
+  const noteInput = document.getElementById('customerNote');
+  const submitBtn = document.getElementById('btnSubmitOrder');
+
+  // 確保任何顧客（含第二人結帳）進入時欄位皆隨時可填寫
+  if (nameInput) nameInput.disabled = false;
+  if (phoneInput) phoneInput.disabled = false;
+  if (noteInput) noteInput.disabled = false;
+  if (submitBtn) {
+    submitBtn.disabled = false;
+    submitBtn.textContent = '確認送出訂單（即時扣除庫存）';
+  }
+  isSubmitting = false;
+
   document.getElementById('cartDrawer')?.classList.add('active');
   document.getElementById('cartBackdrop')?.classList.add('active');
   document.body.style.overflow = 'hidden';

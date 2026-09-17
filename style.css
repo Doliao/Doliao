@@ -683,64 +683,54 @@ body {
   overflow: hidden;
 }
 
-.cart-step-panel {
-  display: flex;
-  flex-direction: column;
+.cart-scroll-view {
   flex: 1;
   min-height: 0;
   height: 100%;
-  overflow: hidden;
-}
-
-.cart-drawer-foot-sticky {
-  flex-shrink: 0;
-  padding: 16px 20px 20px;
-  border-top: 1px solid #e2e8f0;
-  background: #ffffff;
-  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.06);
-}
-
-.cart-checkout-body {
-  flex: 1;
-  min-height: 0;
   overflow-y: auto;
-  overscroll-behavior: contain;
-  padding: 20px 24px;
+  -webkit-overflow-scrolling: touch;
+  padding: 18px 20px 50px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
 }
 
-.cart-checkout-body::-webkit-scrollbar {
+.cart-scroll-view::-webkit-scrollbar {
   width: 6px;
 }
 
-.cart-checkout-body::-webkit-scrollbar-track {
+.cart-scroll-view::-webkit-scrollbar-track {
   background: #f1f5f9;
 }
 
-.cart-checkout-body::-webkit-scrollbar-thumb {
+.cart-scroll-view::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 4px;
 }
 
-.btn-back-to-items {
-  background: transparent;
-  border: none;
-  color: #64748b;
-  font-size: 0.88rem;
-  font-weight: 700;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 0;
-  align-self: flex-start;
-  transition: color 0.15s;
+.cart-scroll-view::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
-.btn-back-to-items:hover {
+.cart-section-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.cart-section-heading {
+  font-size: 0.95rem;
+  font-weight: 800;
   color: #0f172a;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cart-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .cart-order-summary-box {
@@ -750,15 +740,12 @@ body {
   border: 1px solid #e2e8f0;
 }
 
-.cart-drawer-body {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  padding: 16px 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+.cart-checkout-block {
+  background: #ffffff;
+  border-radius: var(--radius-md);
+  padding: 16px 18px 20px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .cart-drawer-body::-webkit-scrollbar {
