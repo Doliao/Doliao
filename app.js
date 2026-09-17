@@ -306,7 +306,12 @@ function renderCart() {
     }).join('');
   }
 
-  // 更新金額顯示
+  // 更新金額顯示與超過4樣滾動提示
+  const scrollHintEl = document.getElementById('cartScrollHint');
+  if (scrollHintEl) {
+    scrollHintEl.style.display = cartItemIds.length > 4 ? 'inline' : 'none';
+  }
+
   if (summaryTextEl) summaryTextEl.textContent = `已選 ${totalCount} 件商品小計`;
   if (subtotalEl) subtotalEl.textContent = `NT$ ${totalAmount.toLocaleString()}`;
   if (grandTotalEl) grandTotalEl.textContent = `NT$ ${totalAmount.toLocaleString()}`;

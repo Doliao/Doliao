@@ -689,10 +689,10 @@ body {
   height: 100%;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 18px 20px 50px;
+  padding: 14px 18px 30px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 14px;
 }
 
 .cart-scroll-view::-webkit-scrollbar {
@@ -721,7 +721,7 @@ body {
   font-size: 0.95rem;
   font-weight: 800;
   color: #0f172a;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -730,20 +730,42 @@ body {
 .cart-items-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
+  max-height: 275px; /* 超過 4 樣物品時，以獨立捲動視窗呈現，絕不推擠遮蓋下方結帳資訊 */
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 6px;
+}
+
+.cart-items-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+.cart-items-list::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.cart-items-list::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.cart-items-list::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 .cart-order-summary-box {
   background: #f8fafc;
   border-radius: var(--radius-md);
-  padding: 14px 18px;
+  padding: 10px 16px;
   border: 1px solid #e2e8f0;
 }
 
 .cart-checkout-block {
   background: #ffffff;
   border-radius: var(--radius-md);
-  padding: 16px 18px 20px;
+  padding: 14px 16px 18px;
   border: 1px solid #e2e8f0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
@@ -784,14 +806,14 @@ body {
 .cart-item-row {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding-bottom: 14px;
+  gap: 12px;
+  padding-bottom: 10px;
   border-bottom: 1px solid #f1f5f9;
 }
 
 .cart-item-img {
-  width: 64px;
-  height: 64px;
+  width: 54px;
+  height: 54px;
   border-radius: var(--radius-sm);
   object-fit: cover;
   border: 1px solid #e2e8f0;
