@@ -265,7 +265,7 @@ function renderCart() {
   }
 
   if (cartEmptyView) cartEmptyView.style.display = 'none';
-  if (cartContentWrap) cartContentWrap.style.display = 'block';
+  if (cartContentWrap) cartContentWrap.style.display = 'flex';
 
   let totalAmount = 0;
 
