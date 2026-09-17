@@ -28,6 +28,35 @@ function getSafeImageUrl(url) {
   return encodeURI(url);
 }
 
+// 智慧雙向容錯找圖：同時支援「根目錄」與「水果/、文具/」子目錄
+function handleAdminImageFallback(imgEl, originalUrl) {
+  const decoded = decodeURI(originalUrl || '');
+  
+  // 若原本沒有子目錄前綴，嘗試加上 水果/ 或 文具/
+  if (!decoded.includes('/') && !decoded.startsWith('http')) {
+    if (['青頻果.png', '水梨.png', '馥香梨.png'].includes(decoded)) {
+      imgEl.onerror = () => { imgEl.onerror = null; };
+      imgEl.src = encodeURI('水果/' + decoded);
+      return;
+    }
+    if (['德制原木鉛筆.png', 'Pentet 原子筆Hybrid.png', '剪刀.png', '橡皮擦.png'].includes(decoded)) {
+      imgEl.onerror = () => { imgEl.onerror = null; };
+      imgEl.src = encodeURI('文具/' + decoded);
+      return;
+    }
+  }
+
+  // 若原本有子目錄前綴但找不到（如使用者把圖檔上傳在根目錄），嘗試剝除前綴
+  if (decoded.includes('/') && !decoded.startsWith('http')) {
+    const filename = decoded.split('/').pop();
+    imgEl.onerror = () => { imgEl.onerror = null; };
+    imgEl.src = encodeURI(filename);
+    return;
+  }
+
+  imgEl.onerror = null;
+}
+
 // 載入資料
 async function loadData() {
   // 1. 讀取商品（檢查版本號以確保本機設定能即刻生效）
@@ -137,7 +166,7 @@ function renderProductsTable() {
     return `
       <tr data-id="${p.id}">
         <td>
-          <img src="${safeImgSrc}" alt="${p.name}" class="table-thumb" id="thumb-${p.id}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80';" />
+          <img src="${safeImgSrc}" alt="${p.name}" class="table-thumb" id="thumb-${p.id}" style="object-fit: contain; background: #fff;" onerror="handleAdminImageFallback(this, '${p.imageUrl}')" />
         </td>
         <td>
           <b>${p.name}</b><br/>
@@ -157,9 +186,9 @@ function renderProductsTable() {
         <td>${p.unit}</td>
         <td>${statusBadge}</td>
         <td>
-          <input type="text" class="form-input prod-img-url" data-id="${p.id}" value="${p.imageUrl}" style="font-size:0.75rem;padding:4px 8px;margin-bottom:4px;" placeholder="例如：水果/青頻果.png 或 https://..." />
+          <input type="text" class="form-input prod-img-url" data-id="${p.id}" value="${p.imageUrl}" style="font-size:0.75rem;padding:4px 8px;margin-bottom:4px;" placeholder="例如：青頻果.png 或 https://..." />
           <small style="display:block;color:var(--text-muted);font-size:0.7rem;">
-            可填寫「水果/檔名.png」、「文具/檔名.png」或網路圖片網址
+            可填寫檔名（如「青頻果.png」）或網路圖片網址
           </small>
         </td>
       </tr>
@@ -229,7 +258,7 @@ async function saveProductChanges() {
   try {
     localStorage.setItem(LOCAL_PRODUCTS_KEY, JSON.stringify(adminProducts));
   } catch (err) {
-    alert('⚠️ 本機儲存失敗：資料量過大（若含有大體積 Base64 圖片，請改用圖片路徑如 水果/青頻果.png）');
+    alert('⚠️ 本機儲存失敗：資料量過大（若含有大體積 Base64 圖片，請改用圖片檔名如 青頻果.png）');
   }
 
   // 若有雲端 API，同步至 Google 試算表
@@ -247,7 +276,7 @@ async function saveProductChanges() {
       if (!result.ok) throw new Error(result.error || '雲端同步失敗');
       alert('✅ 商品價格、庫存與圖片已全數同步更新至 Google 試算表！');
     } catch (e) {
-      alert('⚠️ 雲端試算表更新失敗：\n' + e.message + '\n\n【注意】若圖片使用從電腦上傳的 Base64 過長（超過 Google 試算表儲存格 50,000 字元限制），試算表會拒絕寫入。建議圖片使用本地相對路徑（如「水果/青頻果.png」）或雲端圖床連結！');
+      alert('⚠️ 雲端試算表更新失敗：\n' + e.message + '\n\n【注意】若圖片使用從電腦上傳的 Base64 過長（超過 Google 試算表儲存格 50,000 字元限制），試算表會拒絕寫入。建議圖片使用本地檔案檔名（如「青頻果.png」）或雲端圖床連結！');
     }
   } else {
     alert('✅ 商品價格、庫存與圖片設定已更新（已儲存於本機快取中）！');
@@ -310,7 +339,7 @@ function bindAdminEvents() {
 
   // 還原預設商品並重新載入 config.js
   document.getElementById('btnResetDefault')?.addEventListener('click', () => {
-    if (confirm('確定要強制清除快取並重新載入 config.js 中的最新商品與「水果/文具」圖片路徑嗎？')) {
+    if (confirm('確定要強制清除快取並重新載入 config.js 中的最新商品與圖片路徑嗎？')) {
       adminProducts = JSON.parse(JSON.stringify(INITIAL_PRODUCTS));
       localStorage.setItem(LOCAL_PRODUCTS_KEY, JSON.stringify(adminProducts));
       if (typeof CONFIG_VERSION !== 'undefined') {

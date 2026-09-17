@@ -50,7 +50,7 @@ function updateBannerStatus(customErrorMsg = null) {
   if (!API_URL) {
     banner.innerHTML = `
       <div class="alert-box warning">
-        <span>💡 <b>目前為本機離線體驗模式</b>：已載入「水果」與「文具」實體圖檔資料。可在本機測試選購與扣庫存；設定 <code style="background:rgba(0,0,0,0.06);padding:2px 6px;border-radius:4px">config.js</code> 的 API_URL 後即可無縫串聯 Google 試算表。</span>
+        <span>💡 <b>目前為本機離線體驗模式</b>：已載入「水果」與「文具」實體圖檔。設定 <code style="background:rgba(0,0,0,0.06);padding:2px 6px;border-radius:4px">config.js</code> 的 API_URL 後即可無縫串聯 Google 試算表。</span>
       </div>`;
   } else {
     banner.innerHTML = `
@@ -60,7 +60,7 @@ function updateBannerStatus(customErrorMsg = null) {
   }
 }
 
-// 處理路徑編碼（支援中文字元與空白檔名，如「水果/青頻果.png」與「文具/Pentet 原子筆Hybrid.png」）
+// 處理路徑編碼（支援中文字元與空白檔名）
 function getSafeImageUrl(url) {
   if (!url) return '';
   if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
@@ -69,13 +69,42 @@ function getSafeImageUrl(url) {
   return encodeURI(url);
 }
 
+// 智慧雙向容錯找圖：同時支援「根目錄」與「水果/、文具/」子目錄
+function handleImageFallback(imgEl, originalUrl) {
+  const decoded = decodeURI(originalUrl || '');
+  
+  // 若原本沒有子目錄前綴，嘗試加上 水果/ 或 文具/
+  if (!decoded.includes('/') && !decoded.startsWith('http')) {
+    if (['青頻果.png', '水梨.png', '馥香梨.png'].includes(decoded)) {
+      imgEl.onerror = () => { imgEl.onerror = null; };
+      imgEl.src = encodeURI('水果/' + decoded);
+      return;
+    }
+    if (['德制原木鉛筆.png', 'Pentet 原子筆Hybrid.png', '剪刀.png', '橡皮擦.png'].includes(decoded)) {
+      imgEl.onerror = () => { imgEl.onerror = null; };
+      imgEl.src = encodeURI('文具/' + decoded);
+      return;
+    }
+  }
+
+  // 若原本有子目錄前綴但找不到（如使用者把圖檔上傳在根目錄），嘗試剝除前綴
+  if (decoded.includes('/') && !decoded.startsWith('http')) {
+    const filename = decoded.split('/').pop();
+    imgEl.onerror = () => { imgEl.onerror = null; };
+    imgEl.src = encodeURI(filename);
+    return;
+  }
+
+  imgEl.onerror = null;
+}
+
 // 智慧快取管理：若版本更新或為本機模式，自動更新快取，避免被舊資料卡死
 function loadProductsFromStorage() {
   try {
     const cachedVersion = localStorage.getItem(LOCAL_VERSION_KEY);
     const cached = localStorage.getItem(LOCAL_PRODUCTS_KEY);
 
-    // 若版本相同且有快取，且不是新載入設定
+    // 若版本相同且有快取
     if (cached && cachedVersion === (typeof CONFIG_VERSION !== 'undefined' ? CONFIG_VERSION : '1.0')) {
       products = JSON.parse(cached);
       return;
@@ -96,7 +125,7 @@ function saveProductsToStorage(data) {
   try {
     localStorage.setItem(LOCAL_PRODUCTS_KEY, JSON.stringify(data));
   } catch (e) {
-    console.error('LocalStorage 儲存失敗（可能因圖片過大超過 5MB 限制）', e);
+    console.error('LocalStorage 儲存失敗', e);
   }
 }
 
@@ -167,8 +196,8 @@ function renderProducts() {
 
     return `
       <div class="product-card" data-id="${product.id}">
-        <div class="card-image-wrap">
-          <img src="${safeImgSrc}" alt="${product.name}" class="card-image" loading="lazy" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80';" />
+        <div class="card-image-wrap" style="background: #ffffff; display: flex; align-items: center; justify-content: center;">
+          <img src="${safeImgSrc}" alt="${product.name}" class="card-image" loading="lazy" style="object-fit: contain; padding: 12px;" onerror="handleImageFallback(this, '${product.imageUrl}')" />
           <span class="card-badge ${badgeClass}">${product.badge || product.categoryName}</span>
           ${stockPillHtml}
         </div>
@@ -253,7 +282,7 @@ function renderCart() {
 
       return `
         <div class="cart-item-row" data-id="${id}">
-          <img src="${safeImgSrc}" class="cart-item-img" alt="${item.name}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80';" />
+          <img src="${safeImgSrc}" class="cart-item-img" alt="${item.name}" style="object-fit: contain; background: #fff;" onerror="handleImageFallback(this, '${item.imageUrl}')" />
           <div class="cart-item-info">
             <div class="cart-item-name">${item.name}</div>
             <div class="cart-item-sub">NT$ ${item.price} / ${item.unit}</div>
@@ -427,7 +456,6 @@ async function handleCheckout(e) {
 
 // 本機體驗模式模擬扣庫存
 async function simulateLocalCheckout(orderPayload) {
-  // 模擬網路延遲
   await new Promise(r => setTimeout(r, 600));
 
   // 1. 嚴格比對庫存是否足夠

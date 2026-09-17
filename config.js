@@ -1,10 +1,10 @@
 /**
  * 2026_Htm_Yi 鮮果與文具商城 - 系統核心設定檔
- * 包含預設商品清單、初始價格、庫存量、本機高解析展示圖與 Google Apps Script API 串接網址
+ * 包含預設商品清單、初始價格、庫存量、展示圖與 Google Apps Script API 串接網址
  */
 
 // 版本識別碼：修改設定時更新此版號，前台將自動清除舊版快取並刷新資料
-const CONFIG_VERSION = '2026.09.17.v2';
+const CONFIG_VERSION = '2026.09.17.v3';
 
 // 貼上 Google Apps Script 部署後獲得的 Web 應用程式網址（以 /exec 結尾）
 // 若留空字串 ''，系統將自動啟動「本機單機體驗模式（LocalStorage）」，可直接離線測試完整功能！
@@ -14,7 +14,7 @@ const API_URL = '';
 const SPREADSHEET_NAME = '2026_Htm_Yi';
 
 // 初始商品資料庫定義（包含水果 4 樣、文具 4 樣）
-// 圖片已佈建於本地資料夾：E:\2026_Htm_Yi\水果 與 E:\2026_Htm_Yi\文具
+// 圖片已佈建於專案目錄下，同時相容根目錄與水果/文具資料夾
 const INITIAL_PRODUCTS = [
   // ================= 水果專區 =================
   {
@@ -27,7 +27,7 @@ const INITIAL_PRODUCTS = [
     unit: '顆',
     badge: '青脆微酸',
     description: '產地嚴選青蘋果，果肉爽脆清甜，豐富維他命C，一口咬下多汁回甘。',
-    imageUrl: '水果/青頻果.png',
+    imageUrl: '青頻果.png',
     tags: ['產地直送', '鮮採脆甜']
   },
   {
@@ -53,7 +53,7 @@ const INITIAL_PRODUCTS = [
     unit: '顆',
     badge: '細緻多汁',
     description: '頂級雪白水梨，皮薄肉白、質地細密，水分飽滿清涼解渴。',
-    imageUrl: '水果/水梨.png',
+    imageUrl: '水梨.png',
     tags: ['消暑清甜', '水分飽滿']
   },
   {
@@ -66,7 +66,7 @@ const INITIAL_PRODUCTS = [
     unit: '顆',
     badge: '稀有香甜',
     description: '特殊高雅清香，果肉細嫩無渣，甜而不膩的珍稀限定品種。',
-    imageUrl: '水果/馥香梨.png',
+    imageUrl: '馥香梨.png',
     tags: ['季節限定', '果香濃郁']
   },
 
@@ -81,7 +81,7 @@ const INITIAL_PRODUCTS = [
     unit: '支',
     badge: '滑順好寫',
     description: '德制天然木質筆桿，握感溫潤自然，石墨筆芯均勻不易斷裂。',
-    imageUrl: '文具/德制原木鉛筆.png',
+    imageUrl: '德制原木鉛筆.png',
     tags: ['德制工藝', '無毒環保']
   },
   {
@@ -94,7 +94,7 @@ const INITIAL_PRODUCTS = [
     unit: '支',
     badge: '速乾順暢',
     description: 'Pentel 經典款，超滑順低黏度墨水，出墨穩定不漏墨，人體工學軟膠防滑握把。',
-    imageUrl: '文具/Pentet 原子筆Hybrid.png',
+    imageUrl: 'Pentet 原子筆Hybrid.png',
     tags: ['辦公利器', '極致滑順']
   },
   {
@@ -107,7 +107,7 @@ const INITIAL_PRODUCTS = [
     unit: '把',
     badge: '銳利耐用',
     description: '日本不鏽鋼刀刃，特氟龍防沾膠塗層，弧形刀刃剪切省力50%。',
-    imageUrl: '文具/剪刀.png',
+    imageUrl: '剪刀.png',
     tags: ['防沾膠', '省力弧刃']
   },
   {
@@ -120,7 +120,7 @@ const INITIAL_PRODUCTS = [
     unit: '個',
     badge: '擦拭乾淨',
     description: '聚合物超微細配方，輕輕一擦即淨不傷紙面，屑屑聚條好清理。',
-    imageUrl: '文具/橡皮擦.png',
+    imageUrl: '橡皮擦.png',
     tags: ['不易留屑', '考試專用']
   }
 ];
