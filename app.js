@@ -235,12 +235,45 @@ function renderProducts() {
   }).join('');
 }
 
+// 切換購物車步驟（步驟 1：商品清單；步驟 2：填寫結帳資訊）
+function switchCartStep(step) {
+  const stepItems = document.getElementById('cartStepItems');
+  const stepCheckout = document.getElementById('cartStepCheckout');
+  const titleEl = document.getElementById('cartDrawerTitle');
+  const badgeEl = document.getElementById('cartStepBadge');
+
+  if (step === 'checkout') {
+    if (stepItems) stepItems.style.display = 'none';
+    if (stepCheckout) stepCheckout.style.display = 'flex';
+    if (titleEl) titleEl.innerHTML = '📝 填寫結帳資訊';
+    if (badgeEl) {
+      badgeEl.textContent = '步驟 2/2';
+      badgeEl.style.background = '#d1fae5';
+      badgeEl.style.color = '#065f46';
+    }
+    setTimeout(() => {
+      document.getElementById('customerName')?.focus();
+    }, 80);
+  } else {
+    if (stepItems) stepItems.style.display = 'flex';
+    if (stepCheckout) stepCheckout.style.display = 'none';
+    if (titleEl) titleEl.innerHTML = '🛒 購物清單';
+    if (badgeEl) {
+      badgeEl.textContent = '步驟 1/2';
+      badgeEl.style.background = '#e2e8f0';
+      badgeEl.style.color = '#475569';
+    }
+  }
+}
+
 // 渲染側邊購物車 Drawer
 function renderCart() {
   const cartListEl = document.getElementById('cartItemsList');
   const cartBadge = document.getElementById('cartBadge');
   const cartEmptyView = document.getElementById('cartEmptyView');
   const cartContentWrap = document.getElementById('cartContentWrap');
+  const previewTotalEl = document.getElementById('cartGrandTotalPreview');
+  const summaryTextEl = document.getElementById('cartItemsSummaryText');
   const subtotalEl = document.getElementById('cartSubtotal');
   const grandTotalEl = document.getElementById('cartGrandTotal');
   const navCartTotalEl = document.getElementById('navCartTotal');
@@ -261,6 +294,7 @@ function renderCart() {
     if (cartEmptyView) cartEmptyView.style.display = 'flex';
     if (cartContentWrap) cartContentWrap.style.display = 'none';
     if (navCartTotalEl) navCartTotalEl.textContent = 'NT$ 0';
+    switchCartStep('items');
     return;
   }
 
@@ -301,7 +335,9 @@ function renderCart() {
     }).join('');
   }
 
-  // 更新金額
+  // 更新步驟一與步驟二之金額顯示
+  if (previewTotalEl) previewTotalEl.textContent = `NT$ ${totalAmount.toLocaleString()}`;
+  if (summaryTextEl) summaryTextEl.textContent = `已選 ${totalCount} 件商品品項`;
   if (subtotalEl) subtotalEl.textContent = `NT$ ${totalAmount.toLocaleString()}`;
   if (grandTotalEl) grandTotalEl.textContent = `NT$ ${totalAmount.toLocaleString()}`;
   if (navCartTotalEl) navCartTotalEl.textContent = `NT$ ${totalAmount.toLocaleString()}`;
@@ -341,7 +377,7 @@ function removeFromCart(productId) {
 
 // 結帳送出處理 (防超賣核心流程)
 async function handleCheckout(e) {
-  e.preventDefault();
+  if (e && e.preventDefault) e.preventDefault();
   if (isSubmitting) return;
 
   const nameInput = document.getElementById('customerName');
@@ -586,6 +622,27 @@ function bindEvents() {
     });
   }
 
+  // 步驟一：前往結帳（填寫訂購資訊）
+  const btnGoToCheckout = document.getElementById('btnGoToCheckout');
+  if (btnGoToCheckout) {
+    btnGoToCheckout.addEventListener('click', () => {
+      const cartItemIds = Object.keys(cart).filter(id => cart[id] > 0);
+      if (cartItemIds.length === 0) {
+        showToast('購物車內目前沒有商品喔！', 'warn');
+        return;
+      }
+      switchCartStep('checkout');
+    });
+  }
+
+  // 步驟二：返回修改商品品項
+  const btnBackToItems = document.getElementById('btnBackToItems');
+  if (btnBackToItems) {
+    btnBackToItems.addEventListener('click', () => {
+      switchCartStep('items');
+    });
+  }
+
   // 購物車開啟/關閉
   const cartTrigger = document.getElementById('btnOpenCart');
   const cartClose = document.getElementById('btnCloseCart');
@@ -595,9 +652,12 @@ function bindEvents() {
   if (cartClose) cartClose.addEventListener('click', closeCartDrawer);
   if (backdrop) backdrop.addEventListener('click', closeCartDrawer);
 
-  // 結帳表單送出
+  // 結帳表單送出（支援 Enter 提交與點擊送出按鈕）
   const checkoutForm = document.getElementById('checkoutForm');
   if (checkoutForm) checkoutForm.addEventListener('submit', handleCheckout);
+
+  const btnSubmitOrder = document.getElementById('btnSubmitOrder');
+  if (btnSubmitOrder) btnSubmitOrder.addEventListener('click', handleCheckout);
 
   // 關閉成功彈窗
   const btnCloseDialog = document.getElementById('btnCloseReceipt');
@@ -608,6 +668,7 @@ function bindEvents() {
 }
 
 function openCartDrawer() {
+  switchCartStep('items');
   document.getElementById('cartDrawer')?.classList.add('active');
   document.getElementById('cartBackdrop')?.classList.add('active');
   document.body.style.overflow = 'hidden';

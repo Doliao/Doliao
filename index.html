@@ -89,7 +89,10 @@
   <div class="cart-drawer-backdrop" id="cartBackdrop"></div>
   <aside class="cart-drawer" id="cartDrawer" aria-label="購物車清單">
     <div class="cart-drawer-head">
-      <h3>🛒 購物清單</h3>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <h3 id="cartDrawerTitle">🛒 購物清單</h3>
+        <span id="cartStepBadge" style="font-size: 0.75rem; background: #e2e8f0; color: #475569; padding: 2px 8px; border-radius: 9999px; font-weight: 700;">步驟 1/2</span>
+      </div>
       <button type="button" class="btn-close-drawer" id="btnCloseCart" title="關閉購物車">&times;</button>
     </div>
 
@@ -100,47 +103,70 @@
       <p style="font-size: 0.85rem;">快去挑選新鮮美味的水果與實用文具吧！</p>
     </div>
 
-    <!-- 購物車商品內容 -->
+    <!-- 購物車商品內容（兩步驟結構） -->
     <div id="cartContentWrap" style="display: none;">
-      <div class="cart-drawer-body" id="cartItemsList">
-        <!-- 由 app.js 動態渲染明細項目 -->
-      </div>
-
-      <!-- 結帳明細與訂購人表單 -->
-      <div class="cart-drawer-foot">
-        <div class="cart-summary-calc">
-          <div class="summary-row">
-            <span>商品小計</span>
-            <span id="cartSubtotal">NT$ 0</span>
-          </div>
-          <div class="summary-row">
-            <span>活動優惠 / 運費</span>
-            <span style="color: #10b981; font-weight: 700;">免運費專案</span>
-          </div>
-          <div class="summary-row total">
-            <span>應付總金額</span>
-            <span class="summary-total-price" id="cartGrandTotal">NT$ 0</span>
-          </div>
+      
+      <!-- 步驟一：商品清單與小計 -->
+      <div id="cartStepItems" class="cart-step-panel">
+        <div class="cart-drawer-body" id="cartItemsList">
+          <!-- 由 app.js 動態渲染明細項目 -->
         </div>
 
-        <form class="customer-form" id="checkoutForm" onsubmit="return false">
-          <div class="form-group">
-            <label for="customerName">訂購人姓名 *</label>
-            <input type="text" id="customerName" class="form-input" placeholder="例如：王小明" required autocomplete="name" />
+        <div class="cart-drawer-foot-sticky">
+          <div class="cart-summary-calc" style="margin-bottom: 12px;">
+            <div class="summary-row total" style="margin: 0; padding: 0; border: none;">
+              <span>應付總金額</span>
+              <span class="summary-total-price" id="cartGrandTotalPreview">NT$ 0</span>
+            </div>
           </div>
-          <div class="form-group">
-            <label for="customerPhone">聯絡電話 / 手機 *</label>
-            <input type="tel" id="customerPhone" class="form-input" placeholder="例如：0912-345-678" required autocomplete="tel" />
-          </div>
-          <div class="form-group">
-            <label for="customerNote">備註需求（選填）</label>
-            <input type="text" id="customerNote" class="form-input" placeholder="如：送達時間偏好、部門工號" />
-          </div>
-          <button type="submit" class="btn-checkout" id="btnSubmitOrder">
-            確認送出訂單（即時扣除庫存）
+          <button type="button" class="btn-checkout" id="btnGoToCheckout">
+            前往結帳（填寫訂購資訊） ➔
           </button>
-        </form>
+        </div>
       </div>
+
+      <!-- 步驟二：結帳資訊表單與送出 -->
+      <div id="cartStepCheckout" class="cart-step-panel" style="display: none;">
+        <div class="cart-checkout-body">
+          <button type="button" class="btn-back-to-items" id="btnBackToItems">
+            ← 返回修改商品品項
+          </button>
+
+          <div class="cart-order-summary-box">
+            <div class="summary-row">
+              <span id="cartItemsSummaryText">已選商品明細</span>
+              <span id="cartSubtotal">NT$ 0</span>
+            </div>
+            <div class="summary-row" style="color: #10b981; font-weight: 700;">
+              <span>活動優惠</span>
+              <span>免運費專案</span>
+            </div>
+            <div class="summary-row total">
+              <span>應付總金額</span>
+              <span class="summary-total-price" id="cartGrandTotal">NT$ 0</span>
+            </div>
+          </div>
+
+          <form class="customer-form" id="checkoutForm">
+            <div class="form-group">
+              <label for="customerName">訂購人姓名 *</label>
+              <input type="text" id="customerName" class="form-input" placeholder="請輸入姓名（如：王小明）" required autocomplete="name" />
+            </div>
+            <div class="form-group">
+              <label for="customerPhone">聯絡電話 / 手機 *</label>
+              <input type="tel" id="customerPhone" class="form-input" placeholder="例如：0912-345-678" required autocomplete="tel" />
+            </div>
+            <div class="form-group">
+              <label for="customerNote">備註需求（選填）</label>
+              <input type="text" id="customerNote" class="form-input" placeholder="如：送達時間偏好、部門工號" />
+            </div>
+            <button type="submit" class="btn-checkout" id="btnSubmitOrder" style="margin-top: 14px;">
+              確認送出訂單（即時扣除庫存）
+            </button>
+          </form>
+        </div>
+      </div>
+
     </div>
   </aside>
 
