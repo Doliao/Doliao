@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>2026_Htm_Yi | 管理後台 (商品、庫存與訂單統計)</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .admin-container {
+      max-width: 1200px;
+      margin: 24px auto;
+      padding: 0 24px;
+    }
+    .admin-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 24px;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      padding: 20px 24px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--card-border);
+      box-shadow: var(--glass-shadow);
+    }
+    .admin-header h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .admin-header p {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: var(--radius-md);
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+    }
+    .stat-card .label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .stat-card .value {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: #0f172a;
+      margin-top: 4px;
+    }
+    .stat-card .sub {
+      font-size: 0.75rem;
+      color: #10b981;
+      margin-top: 4px;
+      font-weight: 600;
+    }
+    .section-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      border: 1px solid #e2e8f0;
+      box-shadow: var(--glass-shadow);
+      padding: 24px;
+      margin-bottom: 32px;
+    }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .section-header h3 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .table-responsive {
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.88rem;
+    }
+    th {
+      background: #f8fafc;
+      padding: 12px 14px;
+      font-weight: 700;
+      color: #475569;
+      border-bottom: 2px solid #e2e8f0;
+      white-space: nowrap;
+    }
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+    tr:hover td {
+      background: #fafafa;
+    }
+    .table-thumb {
+      width: 52px;
+      height: 52px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 1px solid #e2e8f0;
+      background: #f1f5f9;
+    }
+    .input-edit {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      font-size: 0.88rem;
+      font-weight: 600;
+      outline: none;
+      width: 90px;
+    }
+    .input-edit:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+    }
+    .btn-action {
+      padding: 8px 16px;
+      border-radius: 9999px;
+      border: none;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s;
+    }
+    .btn-primary-action {
+      background: var(--primary-gradient);
+      color: white;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    }
+    .btn-primary-action:hover {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      transform: translateY(-1px);
+    }
+    .btn-outline-action {
+      background: white;
+      border: 1px solid #cbd5e1;
+      color: #334155;
+    }
+    .btn-outline-action:hover {
+      background: #f8fafc;
+      border-color: #94a3b8;
+    }
+    .img-upload-btn {
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      display: inline-block;
+      font-size: 0.75rem;
+      color: #3b82f6;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+    .img-upload-btn input[type=file] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 頂部導航 -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="brand">
+        <div class="brand-icon">⚙️</div>
+        <div class="brand-title">
+          <h1>2026_Htm_Yi 後台管理系統</h1>
+          <p>庫存設定・價格調整・訂單實時監控</p>
+        </div>
+      </a>
+      <div class="nav-actions">
+        <a href="https://docs.google.com/spreadsheets/u/0/" target="_blank" rel="noopener noreferrer" class="nav-btn">
+          <span>📊 開啟 Google 試算表</span>
+        </a>
+        <a href="index.html" class="nav-btn cart-toggle-btn">
+          <span>🛒 回商城首頁</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="admin-container">
+
+    <!-- 頂部資訊與更新橫幅 -->
+    <div class="admin-header">
+      <div>
+        <h2>📦 營運數據與商品維護</h2>
+        <p>所作調整將即時更新於前台選購畫面，並可同步回傳至試算表 <b id="targetSheetName">2026_Htm_Yi</b>。</p>
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <button type="button" class="btn-action btn-outline-action" id="btnRefreshData">
+          🔄 重新整理
+        </button>
+        <button type="button" class="btn-action btn-primary-action" id="btnSaveAllProducts">
+          💾 儲存商品庫存與價格變更
+        </button>
+      </div>
+    </div>
+
+    <!-- 數據概覽卡片 (Stats Cards) -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="label">累計總營業額</span>
+        <div class="value" id="statRevenue">NT$ 0</div>
+        <span class="sub" id="statAvg">平均客單價 NT$ 0</span>
+      </div>
+      <div class="stat-card">
+        <span class="label">累積完成訂單</span>
+        <div class="value" id="statOrdersCount">0 筆</div>
+        <span class="sub" id="statLatestTime">尚無新訂單</span>
+      </div>
+      <div class="stat-card">
+        <span class="label">全店商品總庫存</span>
+        <div class="value" id="statTotalStock">0 件</div>
+        <span class="sub">包含鮮果與精選文具</span>
+      </div>
+      <div class="stat-card">
+        <span class="label">低庫存警戒項目</span>
+        <div class="value" id="statLowStockCount" style="color: #f59e0b;">0 項</div>
+        <span class="sub" style="color: #d97706;">庫存少於 10 件之商品</span>
+      </div>
+    </div>
+
+    <!-- 商品管理區塊 (Products Management) -->
+    <div class="section-card">
+      <div class="section-header">
+        <h3>🍎✏️ 商品價格、庫存與圖片管理</h3>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" class="btn-action btn-outline-action" id="btnResetDefault">
+            ⚠️ 還原預設商品資料
+          </button>
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 70px;">預覽圖</th>
+              <th>商品名稱</th>
+              <th>分類</th>
+              <th>單價 (NT$)</th>
+              <th>現有庫存</th>
+              <th>單位</th>
+              <th>狀態標記</th>
+              <th style="min-width: 200px;">圖片網址 / 本機上傳</th>
+            </tr>
+          </thead>
+          <tbody id="productsTableBody">
+            <!-- 由 admin.js 動態渲染 -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 訂單明細檢視區塊 (Orders History) -->
+    <div class="section-card">
+      <div class="section-header">
+        <h3>📋 最新訂購紀錄名單</h3>
+        <button type="button" class="btn-action btn-outline-action" id="btnExportCSV">
+          📥 匯出訂單 CSV (Excel 格式)
+        </button>
+      </div>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>訂單編號</th>
+              <th>下單時間</th>
+              <th>訂購人姓名</th>
+              <th>聯絡電話</th>
+              <th>購買品項與數量明細</th>
+              <th>總金額</th>
+              <th>備註</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTableBody">
+            <!-- 由 admin.js 動態渲染 -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="config.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

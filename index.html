@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>2026_Htm_Yi 鮮果與文具生活誌 | 即時選購與庫存扣抵系統</title>
+  
+  <!-- Google 字體預載入 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  
+  <link rel="stylesheet" href="style.css?v=20260917v2" />
+</head>
+<body>
+
+  <!-- 頂部導航列 (Navbar) -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="brand">
+        <div class="brand-icon">🍃</div>
+        <div class="brand-title">
+          <h1>2026_Htm_Yi</h1>
+          <p>旬味鮮果與質感文具選品</p>
+        </div>
+      </a>
+
+      <div class="nav-actions">
+        <a href="admin.html" class="nav-btn" title="進入管理後台檢視訂單與庫存">
+          <span>⚙️ 後台管理</span>
+        </a>
+        
+        <button type="button" class="nav-btn cart-toggle-btn" id="btnOpenCart">
+          <span>🛒 購物車</span>
+          <span id="navCartTotal" style="font-size: 0.8rem; font-weight: 700; opacity: 0.95;">NT$ 0</span>
+          <span class="cart-badge" id="cartBadge" style="display: none;">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 系統狀態提示橫幅 -->
+  <div class="banner-alert" id="connectionBanner"></div>
+
+  <!-- 主視覺形象區塊 (Hero Banner) -->
+  <section class="hero">
+    <div class="hero-card">
+      <div class="hero-content">
+        <h2 class="hero-title" style="font-size: clamp(1.6rem, 4.5vw, 2.6rem); font-weight: 900; color: #ffffff; margin-bottom: 0; letter-spacing: -0.5px; text-shadow: 0 2px 10px rgba(0,0,0,0.15);">DoDo_ 2026 嚴選日常好物</h2>
+      </div>
+    </div>
+  </section>
+
+  <!-- 分類篩選與工具列 (Toolbar) -->
+  <section class="toolbar-wrap">
+    <div class="toolbar">
+      <div class="category-chips">
+        <button type="button" class="chip-btn active" data-category="all">
+          <span>✨ 全部商品</span>
+        </button>
+        <button type="button" class="chip-btn" data-category="fruit">
+          <span>🍎 鮮採水果</span>
+        </button>
+        <button type="button" class="chip-btn" data-category="stationery">
+          <span>✏️ 精選文具</span>
+        </button>
+      </div>
+
+      <div class="toolbar-right">
+        <label class="stock-filter-toggle">
+          <input type="checkbox" id="stockToggle" />
+          <span>只顯示尚有庫存</span>
+        </label>
+      </div>
+    </div>
+  </section>
+
+  <!-- 商品網格區塊 (Products Grid) -->
+  <main class="products-section">
+    <div class="products-grid" id="productsGrid">
+      <!-- 由 app.js 動態渲染卡片 -->
+      <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted);">
+        載入商品資料中…
+      </div>
+    </div>
+  </main>
+
+  <!-- 購物車滑出 Drawer (Slide-Over Panel) -->
+  <div class="cart-drawer-backdrop" id="cartBackdrop"></div>
+  <aside class="cart-drawer" id="cartDrawer" aria-label="購物車清單">
+    <div class="cart-drawer-head">
+      <h3>🛒 購物清單</h3>
+      <button type="button" class="btn-close-drawer" id="btnCloseCart" title="關閉購物車">&times;</button>
+    </div>
+
+    <!-- 空購物車畫面 -->
+    <div class="cart-empty-view" id="cartEmptyView">
+      <div class="cart-empty-icon">🛍️</div>
+      <h4>購物車是空的</h4>
+      <p style="font-size: 0.85rem;">快去挑選新鮮美味的水果與實用文具吧！</p>
+    </div>
+
+    <!-- 購物車商品內容 -->
+    <div id="cartContentWrap" style="display: none; display: flex; flex-direction: column; height: 100%;">
+      <div class="cart-drawer-body" id="cartItemsList">
+        <!-- 由 app.js 動態渲染明細項目 -->
+      </div>
+
+      <!-- 結帳明細與訂購人表單 -->
+      <div class="cart-drawer-foot">
+        <div class="cart-summary-calc">
+          <div class="summary-row">
+            <span>商品小計</span>
+            <span id="cartSubtotal">NT$ 0</span>
+          </div>
+          <div class="summary-row">
+            <span>活動優惠 / 運費</span>
+            <span style="color: #10b981; font-weight: 700;">免運費專案</span>
+          </div>
+          <div class="summary-row total">
+            <span>應付總金額</span>
+            <span class="summary-total-price" id="cartGrandTotal">NT$ 0</span>
+          </div>
+        </div>
+
+        <form class="customer-form" id="checkoutForm" onsubmit="return false">
+          <div class="form-group">
+            <label for="customerName">訂購人姓名 *</label>
+            <input type="text" id="customerName" class="form-input" placeholder="例如：王小明" required autocomplete="name" />
+          </div>
+          <div class="form-group">
+            <label for="customerPhone">聯絡電話 / 手機 *</label>
+            <input type="tel" id="customerPhone" class="form-input" placeholder="例如：0912-345-678" required autocomplete="tel" />
+          </div>
+          <div class="form-group">
+            <label for="customerNote">備註需求（選填）</label>
+            <input type="text" id="customerNote" class="form-input" placeholder="如：送達時間偏好、部門工號" />
+          </div>
+          <button type="submit" class="btn-checkout" id="btnSubmitOrder">
+            確認送出訂單（即時扣除庫存）
+          </button>
+        </form>
+      </div>
+    </div>
+  </aside>
+
+  <!-- 訂購完成對話框 (Native Dialog) -->
+  <dialog id="orderDoneDialog">
+    <div class="dialog-content">
+      <div id="orderDoneDetails"></div>
+      <button type="button" class="btn-dialog-close" id="btnCloseReceipt">好的，我知道了</button>
+    </div>
+  </dialog>
+
+  <!-- 腳本載入（附加版本號以防止快取舊檔） -->
+  <script src="config.js?v=20260917v2"></script>
+  <script src="app.js?v=20260917v2"></script>
+</body>
+</html>
