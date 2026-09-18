@@ -987,9 +987,7 @@ body {
 
 /* 提示訊息 Toast 與 Banner */
 .banner-alert {
-  max-width: 1200px;
-  margin: 12px auto 0;
-  padding: 12px 24px;
+  display: none !important;
 }
 
 .alert-box {

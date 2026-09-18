@@ -41,39 +41,10 @@ async function initSystem() {
   }
 }
 
-// 顯示目前連線狀態（一般消費者隱藏，僅管理員模式 ?admin 時顯示）
-function updateBannerStatus(customErrorMsg = null) {
+// 移除舊版技術除錯橫幅，維持消費者純淨購物體驗
+function updateBannerStatus() {
   const banner = document.getElementById('connectionBanner');
-  if (!banner) return;
-
-  const urlParams = new URLSearchParams(window.location.search);
-  const isAdmin = urlParams.has('admin');
-
-  // 若不是管理員模式，保持首頁乾淨，不顯示任何技術性除錯條
-  if (!isAdmin) {
-    banner.innerHTML = '';
-    return;
-  }
-
-  if (customErrorMsg) {
-    banner.innerHTML = `
-      <div class="alert-box warning">
-        <span>⚠️ <b>後端連線警告</b>：${customErrorMsg}（目前顯示本機最新設定資料）。</span>
-      </div>`;
-    return;
-  }
-
-  if (!API_URL) {
-    banner.innerHTML = `
-      <div class="alert-box warning">
-        <span>💡 <b>管理者模式（本機離線）</b>：尚未設定 <code style="background:rgba(0,0,0,0.06);padding:2px 6px;border-radius:4px">config.js</code> 的 API_URL。</span>
-      </div>`;
-  } else {
-    banner.innerHTML = `
-      <div class="alert-box info">
-        <span>☁️ <b>管理者模式（雲端同步）</b>：已連線至 Google 試算表 (${SPREADSHEET_NAME})。</span>
-      </div>`;
-  }
+  if (banner) banner.remove();
 }
 
 // 處理路徑編碼（支援中文字元與空白檔名）
