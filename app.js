@@ -306,10 +306,10 @@ function renderCart() {
     }).join('');
   }
 
-  // 更新金額顯示與超過4樣滾動提示
-  const scrollHintEl = document.getElementById('cartScrollHint');
-  if (scrollHintEl) {
-    scrollHintEl.style.display = cartItemIds.length > 4 ? 'inline' : 'none';
+  // 更新金額顯示與超過3樣快速前往結帳按鈕
+  const btnJump = document.getElementById('btnJumpToCheckout');
+  if (btnJump) {
+    btnJump.style.display = cartItemIds.length > 3 ? 'inline-flex' : 'none';
   }
 
   if (summaryTextEl) summaryTextEl.textContent = `已選 ${totalCount} 件商品小計`;
@@ -608,6 +608,20 @@ function bindEvents() {
         addToCart(btnCartMinus.dataset.id, -1);
       } else if (btnRemove) {
         removeFromCart(btnRemove.dataset.id);
+      }
+    });
+  }
+
+  // 快速前往結帳資訊按鈕（平滑滾動並聚焦姓名欄位）
+  const btnJump = document.getElementById('btnJumpToCheckout');
+  if (btnJump) {
+    btnJump.addEventListener('click', () => {
+      const checkoutFormEl = document.getElementById('checkoutForm');
+      if (checkoutFormEl) {
+        checkoutFormEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setTimeout(() => {
+          document.getElementById('customerName')?.focus();
+        }, 300);
       }
     });
   }

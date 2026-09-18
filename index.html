@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   
-  <link rel="stylesheet" href="style.css?v=20260918v3" />
+  <link rel="stylesheet" href="style.css?v=20260918v4" />
 </head>
 <body>
 
@@ -110,7 +110,9 @@
       <div class="cart-section-block">
         <div class="cart-section-heading">
           <span>📦 已選購商品明細</span>
-          <span id="cartScrollHint" style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal; margin-left: auto; display: none;">↕️ 超過4樣可捲動</span>
+          <button type="button" id="btnJumpToCheckout" class="btn-jump-checkout" style="display: none;" title="快速滑動至下方填寫結帳資訊">
+            ⬇️ 快速填寫結帳
+          </button>
         </div>
         <div id="cartItemsList" class="cart-items-list">
           <!-- 由 app.js 動態渲染明細項目 -->
@@ -167,7 +169,7 @@
   </dialog>
 
   <!-- 腳本載入（附加版本號以防止快取舊檔） -->
-  <script src="config.js?v=20260918v3"></script>
-  <script src="app.js?v=20260918v3"></script>
+  <script src="config.js?v=20260918v4"></script>
+  <script src="app.js?v=20260918v4"></script>
 </body>
 </html>
