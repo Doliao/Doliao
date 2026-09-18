@@ -26,7 +26,7 @@
       </a>
 
       <div class="nav-actions">
-        <a href="admin.html" class="nav-btn" title="進入管理後台檢視訂單與庫存">
+        <a href="admin.html" class="nav-btn" id="navAdminBtn" style="display: none;" title="進入管理後台檢視訂單與庫存">
           <span>⚙️ 後台管理</span>
         </a>
         
@@ -84,6 +84,14 @@
       </div>
     </div>
   </main>
+
+  <!-- 頁尾版權與管理專用入口 -->
+  <footer style="text-align: center; padding: 40px 24px 30px; color: var(--text-muted); font-size: 0.82rem;">
+    <p>© 2026 DoDo_ 嚴選日常好物 ‧ 鮮採果物與質感文房具</p>
+    <p style="margin-top: 8px;">
+      <a href="admin.html" style="color: inherit; text-decoration: none; opacity: 0.35; transition: opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.35" title="管理者登入入口">🔒 管理登入</a>
+    </p>
+  </footer>
 
   <!-- 購物車滑出 Drawer (Slide-Over Panel) -->
   <div class="cart-drawer-backdrop" id="cartBackdrop"></div>

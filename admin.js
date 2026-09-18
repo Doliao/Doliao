@@ -11,6 +11,8 @@ const LOCAL_ORDERS_KEY = '2026_Htm_Yi_orders';
 const LOCAL_VERSION_KEY = '2026_Htm_Yi_version';
 
 document.addEventListener('DOMContentLoaded', () => {
+  if (!checkAdminAuth()) return;
+
   const targetSheet = document.getElementById('targetSheetName');
   if (targetSheet && typeof SPREADSHEET_NAME !== 'undefined') {
     targetSheet.textContent = SPREADSHEET_NAME;
@@ -19,6 +21,24 @@ document.addEventListener('DOMContentLoaded', () => {
   loadData();
   bindAdminEvents();
 });
+
+// 管理者身分驗證（防止一般顧客誤闖）
+function checkAdminAuth() {
+  const sessionAuth = sessionStorage.getItem('admin_authenticated');
+  if (sessionAuth === 'true') return true;
+
+  const validPwd = typeof ADMIN_PASSWORD !== 'undefined' ? ADMIN_PASSWORD : 'admin';
+  const inputPwd = prompt('🔐 請輸入後台管理密碼：\n（預設密碼為：admin，可於 config.js 自行更換）');
+
+  if (inputPwd === validPwd) {
+    sessionStorage.setItem('admin_authenticated', 'true');
+    return true;
+  } else {
+    alert('❌ 密碼錯誤或取消登入，將為您導回商城首頁！');
+    window.location.href = 'index.html';
+    return false;
+  }
+}
 
 function getSafeImageUrl(url) {
   if (!url) return '';
@@ -336,6 +356,7 @@ function bindAdminEvents() {
     alert('已重新整理最新資料！');
   });
   document.getElementById('btnExportCSV')?.addEventListener('click', exportOrdersToCSV);
+  document.getElementById('btnClearOrders')?.addEventListener('click', handleClearOrders);
 
   // 還原預設商品並重新載入 config.js
   document.getElementById('btnResetDefault')?.addEventListener('click', () => {
@@ -350,4 +371,25 @@ function bindAdminEvents() {
       alert('已重新載入最新商品與圖片路徑！前台將同步顯示最新圖片。');
     }
   });
+}
+
+// 清空所有歷史訂單紀錄
+function handleClearOrders() {
+  if (adminOrders.length === 0) {
+    alert('目前沒有任何訂單紀錄可清空！');
+    return;
+  }
+
+  const confirmed = confirm('⚠️ 確定要清空所有歷史訂單紀錄嗎？\n\n此動作將清除目前所有累積完成的測試訂單，並將累計營業額重置為 0。');
+  if (!confirmed) return;
+
+  adminOrders = [];
+  try {
+    localStorage.setItem(LOCAL_ORDERS_KEY, JSON.stringify([]));
+  } catch (e) {}
+
+  renderAdminStats();
+  renderOrdersTable();
+
+  alert('✅ 已成功清空所有訂單紀錄！\n\n💡 提示：若您已串聯 Google 試算表，可一併開啟 Google 試算表 2026_Htm_Yi 的 Orders 工作表，將測試資料列刪除。');
 }

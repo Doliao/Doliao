@@ -13,6 +13,9 @@ const API_URL = '';
 // 試算表名稱（供對照與後端初始化使用）
 const SPREADSHEET_NAME = '2026_Htm_Yi';
 
+// 後台管理員專用登入密碼（預設為 admin，可自行修改）
+const ADMIN_PASSWORD = 'admin';
+
 // 初始商品資料庫定義（包含水果 4 樣、文具 4 樣）
 // 圖片已佈建於專案目錄下，同時相容根目錄與水果/文具資料夾
 const INITIAL_PRODUCTS = [

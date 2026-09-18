@@ -295,9 +295,14 @@
     <div class="section-card">
       <div class="section-header">
         <h3>📋 最新訂購紀錄名單</h3>
-        <button type="button" class="btn-action btn-outline-action" id="btnExportCSV">
-          📥 匯出訂單 CSV (Excel 格式)
-        </button>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button type="button" class="btn-action btn-outline-action" id="btnExportCSV">
+            📥 匯出訂單 CSV (Excel 格式)
+          </button>
+          <button type="button" class="btn-action" id="btnClearOrders" style="background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5;" title="清空目前的測試訂單紀錄">
+            🗑️ 清空訂單紀錄
+          </button>
+        </div>
       </div>
       <div class="table-responsive">
         <table>
@@ -321,7 +326,7 @@
 
   </div>
 
-  <script src="config.js?v=20260918v2"></script>
-  <script src="admin.js?v=20260918v2"></script>
+  <script src="config.js?v=20260918v4"></script>
+  <script src="admin.js?v=20260918v4"></script>
 </body>
 </html>
